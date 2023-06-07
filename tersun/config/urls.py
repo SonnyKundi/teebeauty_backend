@@ -19,12 +19,25 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'provider_services/', include('tersun.provider_services.urls')),
     path(r'providers/', include('tersun.providers.urls')),
     path(r'appointments/', include('tersun.appointments.urls')),
+    path(r'payments/', include('tersun.payments.urls')),
+    path(r'users/', include('tersun.users.urls')),
+]
 
+urlpatterns += [
+    # Your URLs...
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

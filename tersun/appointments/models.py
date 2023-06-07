@@ -1,7 +1,7 @@
 """Appointments models file."""
 
 from tersun.common.models import AbstractBase
-from tersun.provider_services.models import Service, Town
+from tersun.provider_services.models import Service
 from django.db import models
 from django.core.validators import MinValueValidator
 
@@ -17,24 +17,21 @@ REVIEWER_CHOICES = (
     ("CLIENT", "CLIENT"),
 )
 
-
-# TODO Create Clients Model and use it to make bookings.
 class Booking(AbstractBase):
     """Bookings model."""
 
-    services = models.ManyToManyField(Service, through="BookingService")
-    time = models.DateTimeField(null=False, blank=False)
-    location = models.ForeignKey(Town, on_delete=models.PROTECT)
-    house_call = models.BooleanField(default=False)
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)  
     phone_number = models.CharField(max_length=300, null=False, blank=False)
-    pricing = models.DecimalField(max_digits=30, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0.00)], default=0)
+    whatsapp_number = models.CharField(max_length=300, null=True, blank=True)
     email = models.EmailField(max_length=300, null=True, blank=True)
-    booking_charge = models.DecimalField(max_digits=30, decimal_places=2,null=True, blank=True, validators=[MinValueValidator(0.00)], default=0)
-    paid = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
 
-    def __str__(self) -> str:
-        return self.phone_number + " " + self.time.strftime("%Y/%m/%d, %H:%M:%S") 
-    
+    def approve(self):
+        """Approve booking function."""
+        self.approved = True
+        self.save()
+
+
 class BookingService(AbstractBase):
     """Bookings Services models."""
 

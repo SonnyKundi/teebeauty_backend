@@ -2,10 +2,13 @@
 
 from tersun.appointments import models
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField, SerializerMethodField
 
-
-class BookingSerializer(serializers.HyperlinkedModelSerializer):
+class BookingSerializer(serializers.ModelSerializer):
     """Serializer class for booking."""
+
+    service_name = ReadOnlyField(source='service.service_name')
+    provider_name = ReadOnlyField(source='service.provider.full_name')
 
     class Meta:
         """Meta class."""
@@ -14,7 +17,7 @@ class BookingSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class BookingServiceSerializer(serializers.HyperlinkedModelSerializer):
+class BookingServiceSerializer(serializers.ModelSerializer):
     """Serializer class for booking services."""
 
     class Meta:
@@ -24,7 +27,7 @@ class BookingServiceSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
+class AppointmentSerializer(serializers.ModelSerializer):
     """Serializer class for appointments."""
 
     class Meta:
@@ -34,7 +37,7 @@ class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class FeedbackSerializer(serializers.HyperlinkedModelSerializer):
+class FeedbackSerializer(serializers.ModelSerializer):
     """Serializer class for feedback."""
 
     class Meta:

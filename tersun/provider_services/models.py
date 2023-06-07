@@ -38,8 +38,8 @@ class Town(AbstractBase):
 
     def __str__(self) -> str:
         return "{}, {}".format(self.town_name, self.county)
-    
- 
+
+
 # TODO Refactor Towns to use Locations instead.
 class Service(AbstractBase):
     """Services model."""
@@ -53,6 +53,35 @@ class Service(AbstractBase):
     description = models.TextField()
     billboard_image = models.FileField(upload_to=get_directory)
 
+    @property
+    def categories(self):
+        """Get categories."""
+        categories = list(set(ServiceSubCategory.objects.filter(service=self).values_list('sub_category__category__category_name', flat=True)))
+        return categories
+
+    @property
+    def locations(self):
+        """Get the towns the service is available."""
+        service_towns = ServiceTown.objects.filter(service=self)
+        if not service_towns.exists():
+            return []
+
+        locations = []
+        for service_town in service_towns:
+            location = f"{service_town.town.town_name}, {service_town.town.county}"
+            locations.append(location)
+
+        return locations
+
+    @property
+    def average_rating(self):
+        """Get average rating."""
+        ratings = Rating.objects.filter(service=self).values_list("rating", flat=True)
+        count = Rating.objects.filter(service=self).count()
+        if count <= 0:
+            return 0
+        return sum(ratings)/count
+
     def __str__(self) -> str:
         return self.service_name
 
@@ -62,7 +91,6 @@ class ServiceSubCategory(AbstractBase):
 
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     sub_category = models.ForeignKey(SubCategory,on_delete=models.CASCADE)
-
 
 
 class ServiceTown(AbstractBase):
@@ -86,3 +114,11 @@ class ServiceVideo(AbstractBase):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     video = models.FileField(upload_to=get_directory, null=True, blank=True)
     video_url = models.URLField(null=True, blank=True)
+
+
+class Rating(AbstractBase):
+    """Rating class."""
+
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    comment = models.TextField(blank=True, null=True)

@@ -15,6 +15,14 @@ GENDER_CHOICES = (
     ('OTHER', 'OTHER'),
 )
 
+USER_TYPE_CHOICES = (
+    ("ADMIN", "ADMIN"),
+    ("CLIENT", "CLIENT"),
+    ("PROVIDER", "PROVIDER"),
+)
+
+CLIENT="CLIENT"
+
 
 class UserManager(BaseUserManager):
     """User manager class."""
@@ -35,6 +43,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.user_type = "ADMIN"
         user.save(using=self._db)
         return user    
 
@@ -51,6 +60,9 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=300, null=False, blank=False)
     last_name = models.CharField(max_length=300, null=False, blank=False)
     other_names = models.CharField(max_length=300, null=True, blank=True)
+    username = models.CharField(max_length=300, null=True, blank=True)
+    user_type= models.CharField(
+        max_length=300, null=True, blank=True, choices=USER_TYPE_CHOICES, default=CLIENT)
     email = models.EmailField(max_length=300, null=False, blank=False, unique=True, verbose_name='email address')
     password = models.CharField(max_length=300, null=True, blank=True)
     phone_number = models.CharField(max_length=300, null=True, blank=True)
@@ -61,8 +73,12 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-   
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    def get_full_name(self):
+        """Format the user's full name."""
+        return '{} {}'.format(self.first_name, self.last_name)

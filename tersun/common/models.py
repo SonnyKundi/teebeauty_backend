@@ -18,6 +18,7 @@ class AbstractBase(models.Model):
     created_by = models.UUIDField(editable=True)
     updated_on = models.DateTimeField(db_index=True, default=timezone.now)
     updated_by = models.UUIDField()
+    is_active = models.BooleanField(default=True)
 
     def retain_created_on_and_created_by(self):
         """Retain values for created_on and created_by fields on update."""
@@ -52,10 +53,10 @@ class BioData(AbstractBase):
     first_name = models.CharField(max_length=300, null=False, blank=False)
     last_name = models.CharField(max_length=300, null=False, blank=False)
     other_names = models.CharField(max_length=300, null=True, blank=True)
-    email = models.EmailField(max_length=300)
+    email = models.EmailField(max_length=300, null=True, blank=True)
     phone_number = models.CharField(max_length=300, null=True, blank=True)
     date_of_birth =  models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=300, choices=GENDER_CHOICES, null=False, blank=False)
+    gender = models.CharField(max_length=300, choices=GENDER_CHOICES, null=True, blank=True)
     join_date = models.DateTimeField(default=timezone.now)
 
     class Meta:
